@@ -135,7 +135,7 @@ void ADC_Init(void){
                        Vin * 256	
         ADC_VALUE = ----------------  ;  19.53 mv por paso aprox
                          VCC
-	*/
+*/
 	
 	ADMUX |= (1<<MUX0); // ADC0 en pin PB0
 	ADCSRA |= (1<<ADEN) | (1<<ADATE) | (1<<ADIF) | (1<<ADIE) | (1<<ADSC); // 
