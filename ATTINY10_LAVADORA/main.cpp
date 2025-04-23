@@ -4,7 +4,7 @@
  * Created: 29/03/2025 08:25:05 p. m.
  * Author : UGB
  * Descripcion: Control de tiempo para el ciclo de centrifugado de
- *				de lavadora usando un ATTiny10.
+ *              de lavadora usando un ATTiny10.
  */ 
 
 #define F_CPU 980000UL
@@ -14,39 +14,39 @@
 
 /*  Divisor de Voltaje:
    
-					Vin * R2
+                    Vin * R2
           Vout = ---------------
                      R1 + R2
 
-      Donde:
-               R1 = 1.8K
-			   Vin = 5 Volts
-			   R2 = 220, 470, 680, 820, 1k y 1.5k
+    Donde:
+          R1 = 1.8K
+          Vin = 5 Volts
+          R2 = 220, 470, 680, 820, 1k y 1.5k
 */
 
-//									  |-- Rango ADC  --||--- Rango de voltaje --||-- Voltaje Divisor--|                                 
-#define _1_Minuto	99	//	820 ohm		99 A 107 = 8	MIN = 1.95	MAX = 2.1		Vdiv = 2.0
-#define _5_Minuto	108 //	1k ohm		108 A 118 = 10	MIN = 2.12	MAX = 2.3		Vdiv = 2.19
-#define _10_Minuto	130 //	1.5k ohm	130 A 140 = 10	MIN = 2.55	MAX = 2.73		Vdiv = 2.61
-#define START		51	//	220 ohm		51 A 61 = 10	MIN = 1.00	MAX = 1.2		Vdiv = 1.13
-#define PAUSE		74	//	470 ohm		74 A 84 = 10	MIN = 1.45	MAX = 1.65		Vdiv = 1.56
-#define STOP		89	//	680 ohm		89 A 98	= 9		MIN = 1.75	MAX = 1.91		Vdiv = 1.83
+//                                   |-- Rango ADC  --||--- Rango de voltaje --||-- Voltaje Divisor--|                                 
+#define _1_Minuto   99  //  820 ohm     99 A 107 = 8    MIN = 1.95  MAX = 2.1       Vdiv = 2.0
+#define _5_Minuto   108 //  1k ohm      108 A 118 = 10  MIN = 2.12  MAX = 2.3       Vdiv = 2.19
+#define _10_Minuto  130 //  1.5k ohm    130 A 140 = 10  MIN = 2.55  MAX = 2.73      Vdiv = 2.61
+#define START       51  //  220 ohm     51 A 61 = 10    MIN = 1.00  MAX = 1.2       Vdiv = 1.13
+#define PAUSE       74  //  470 ohm     74 A 84 = 10    MIN = 1.45  MAX = 1.65      Vdiv = 1.56
+#define STOP        89  //  680 ohm     89 A 98	= 9     MIN = 1.75  MAX = 1.91      Vdiv = 1.83
 
 /*
-				prescaler						1024
-	Tcount =------------------  <==>  Tcount= ------- = 1.044 ms
-				F_CPU							980000
+               prescaler                        1024
+     Tcount =------------------  <==>  Tcount= ------- = 1.044 ms
+                F_CPU                          980000
 				  
-	Nota: Se usa la diferencia de (65536 - pasos) para usar la interrupcion por sobre flujo
-		  que me permitira restar la variable Tiempo_Acumulado cada segundo o cada minuto
-		  segun sea el caso.
+    Nota: Se usa la diferencia de (65536 - pasos) para usar la interrupcion por sobre flujo
+          que me permitira restar la variable Tiempo_Acumulado cada segundo o cada minuto
+          segun sea el caso.
 	
-	Consideraciones: Al usar la interrupcion por sobreflujo se debera deshabilitar si se usa 
-					 algun PWM ya que usa comparacion en OCR0A/OCR0B, esto ocaciona que se genera
-					 una interrupcion por sobleflujo ocacionando que la variable de Tiempo_Acumulado
-					 decremente n veces al estar activa x tiempo, por ejemplo, si la frecuencia PWM 
-					 es de 2KHz y se mantiene durante 150 ms entonces se tiene que la interrupcion 
-					 por sobreflujo se genero 300 veces.  
+    Consideraciones: Al usar la interrupcion por sobreflujo se debera deshabilitar si se usa 
+                     algun PWM ya que usa comparacion en OCR0A/OCR0B, esto ocaciona que se genera
+                     una interrupcion por sobleflujo ocacionando que la variable de Tiempo_Acumulado
+                     decremente n veces al estar activa x tiempo, por ejemplo, si la frecuencia PWM 
+                     es de 2KHz y se mantiene durante 150 ms entonces se tiene que la interrupcion 
+                     por sobreflujo se genero 300 veces.  
 */
 
 #define Set_1min	(65536-((F_CPU*60)/1024)) //  (60000 ms/1.044ms) = 57471 pasos
@@ -54,7 +54,7 @@
 #define Rele_ON		(PORTB |= (1<<PORTB2))
 #define Rele_OFF	(PORTB &= ~(1<<PORTB2))
 #define Beep		(ICR0 = (F_CPU / 2000 )-1) // Frecuencia de 2 KHz para sonido beep
-#define Disable_PWM (DDRB &= ~(1<<PORTB1))
+#define Disable_PWM	(DDRB &= ~(1<<PORTB1))
 #define Enable_PWM	(DDRB |= (1<<PORTB1))
 
 volatile uint8_t Tiempo_Acumulado = 0, ADC_VALUE = 0;
@@ -131,10 +131,10 @@ int main(void){
 
 void ADC_Init(void){
 /*
-		ADC VREF = 5 VCC
-						Vin * 256	
-		ADC_VALUE = ----------------  ;  19.53 mv por paso aprox
-						  VCC
+        ADC VREF = 5 VCC
+                       Vin * 256	
+        ADC_VALUE = ----------------  ;  19.53 mv por paso aprox
+                         VCC
 	*/
 	
 	ADMUX |= (1<<MUX0); // ADC0 en pin PB0
@@ -177,9 +177,9 @@ ISR(TIM0_OVF_vect){ // rutina por sobreflujo cada minuto
 
 void Activar_Sonido_STOP(void){
 /*
-					F_CPU
-		ICR0 = -------------------   -  1
-				2 * PRES * Fout
+                      F_CPU
+         ICR0 = -------------------   -  1
+                 2 * PRES * Fout
 */
 	
 	PWM__Beep_Enable();
@@ -230,13 +230,13 @@ void PWM__Beep_Enable(void){
 }
 
 void PWM__Beep_Disable(void){
-	TCCR0B = ICR0 = OCR0B = TIMSK0 = TCCR0A = 0; // Parar Timer
+	TCCR0B = ICR0 = OCR0B = TIMSK0 = TCCR0A = 0; 
 }
 
 void Enable_Beep(void){
-	Enable_PWM; // se habilita PWM
+	Enable_PWM;
 	_delay_ms(250);
-	Disable_PWM; // se deshabilita PWM
+	Disable_PWM;
 	_delay_ms(150);
 }
 
